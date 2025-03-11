@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 
-// Changed file extension to .ts and using default export
+// Change to default export
 export default function useMobile(): boolean {
   const [isMobile, setIsMobile] = useState(false)
 

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react"
 import { motion } from "framer-motion"
 import { type Skill, skillsData } from "@/data/skills-data"
-import { useMobile } from "@/hooks/use-mobile"
 
 interface Vector {
   x: number
@@ -25,7 +24,26 @@ interface SkillsBubblesProps {
 export default function SkillsBubbles({ onSelectSkill, selectedSkill, containerRef }: SkillsBubblesProps) {
   const [bubbles, setBubbles] = useState<BubbleState[]>([])
   const animationRef = useRef<number>()
-  const isMobile = useMobile()
+  // Implement mobile detection directly in the component
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Handle mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    // Set initial value
+    handleResize()
+
+    // Listen for window resize events
+    window.addEventListener("resize", handleResize)
+
+    // Clean up event listener on unmount
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
 
   // Initialize bubbles with random positions and velocities
   useEffect(() => {

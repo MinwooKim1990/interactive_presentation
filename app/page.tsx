@@ -2,9 +2,17 @@
 
 import { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import SkillsBubbles from "@/components/skills-bubbles"
+import dynamic from "next/dynamic"
+import SkillsBubblesFallback from "@/components/skills-bubbles-fallback"
 import SkillDetails from "@/components/skill-details"
 import type { Skill } from "@/data/skills-data"
+
+// Dynamically import the SkillsBubbles component with no SSR
+// This prevents hydration errors with window-dependent code
+const SkillsBubbles = dynamic(() => import("@/components/skills-bubbles"), {
+  ssr: false,
+  loading: () => <SkillsBubblesFallback onSelectSkill={() => {}} selectedSkill={null} />,
+})
 
 export default function Home() {
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
