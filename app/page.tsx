@@ -1,5 +1,5 @@
 "use client"
-
+import { companyName } from "@/data/config"
 import { useState, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import dynamic from "next/dynamic"
@@ -28,7 +28,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            My Skills & Projects
+            What can I brings to {companyName}?
           </motion.h1>
           <motion.p
             className="text-lg text-blue-300 italic"

@@ -1,0 +1,33 @@
+/* 마크다운 스타일링 */
+.markdown-content h1 {
+    @apply text-2xl font-bold mt-6 mb-4 text-blue-300;
+  }
+  
+  .markdown-content h2 {
+    @apply text-xl font-semibold mt-5 mb-3 text-blue-300;
+  }
+  
+  .markdown-content h3 {
+    @apply text-lg font-medium mt-4 mb-2 text-blue-200;
+  }
+  
+  .markdown-content p {
+    @apply text-lg leading-relaxed my-3;
+  }
+  
+  .markdown-content ul {
+    @apply space-y-2 my-3 pl-4;
+  }
+  
+  .markdown-content li {
+    @apply ml-4 mb-1;
+  }
+  
+  .markdown-content li::before {
+    content: "•";
+    @apply text-blue-300 mr-2;
+  }
+  
+  .markdown-content strong {
+    @apply font-semibold text-blue-200;
+  }

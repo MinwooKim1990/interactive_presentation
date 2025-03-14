@@ -5,6 +5,10 @@ import type { Skill } from "@/data/skills-data"
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import React, { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 interface SkillDetailsProps {
   skill: Skill
@@ -12,6 +16,17 @@ interface SkillDetailsProps {
 }
 
 export default function SkillDetails({ skill, onClose }: SkillDetailsProps) {
+  const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
+
+  // 이미지 클릭 핸들러
+  const handleImageClick = (imageUrl: string) => {
+    if (enlargedImage === imageUrl) {
+      setEnlargedImage(null);
+    } else {
+      setEnlargedImage(imageUrl);
+    }
+  };
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
@@ -20,6 +35,27 @@ export default function SkillDetails({ skill, onClose }: SkillDetailsProps) {
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
+      {enlargedImage && (
+        <div 
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/80"
+          onClick={(e) => {
+            e.stopPropagation();
+            setEnlargedImage(null);
+          }}
+          style={{ pointerEvents: 'all' }}
+        >
+          <motion.img
+            src={enlargedImage}
+            alt="Enlarged view"
+            className="max-w-[90%] max-h-[90vh] object-contain"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: "spring", damping: 25 }}
+          />
+        </div>
+      )}
+
       <motion.div
         className="w-full max-w-4xl max-h-[90vh] overflow-auto rounded-xl"
         initial={{ scale: 0.9, y: 20 }}
@@ -61,7 +97,15 @@ export default function SkillDetails({ skill, onClose }: SkillDetailsProps) {
                   {skill.images.map((image, index) => (
                     <div
                       key={index}
-                      className="aspect-video bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center"
+                      className={`aspect-video bg-gray-800/50 rounded-lg overflow-hidden flex items-center justify-center cursor-pointer ${
+                        enlargedImage ? "" : "transition-transform hover:scale-[1.02]"
+                      }`}
+                      onClick={() => handleImageClick(image)}
+                      style={{ 
+                        pointerEvents: enlargedImage ? 'none' : 'auto',
+                        // 확대 이미지가 표시될 때 클릭한 이미지는 뒤로 숨김
+                        zIndex: enlargedImage === image ? -1 : 'auto'
+                      }}
                     >
                       <img
                         src={image || "/placeholder.svg"}
@@ -74,24 +118,37 @@ export default function SkillDetails({ skill, onClose }: SkillDetailsProps) {
               </div>
             )}
 
-            {/* Description Section */}
-            <div className="description-section">
-              <h3 className="text-xl font-semibold mb-4 text-blue-300">Description</h3>
+            {/* Case Studies Section */}
+            <div className="case-studies-section">
+              <h3 className="text-xl font-semibold mb-4 text-blue-300">Case Studies</h3>
               <div className="prose prose-invert max-w-none">
                 <p className="text-lg leading-relaxed">{skill.details}</p>
-
-                {skill.achievements && skill.achievements.length > 0 && (
-                  <>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Key Achievements</h3>
-                    <ul className="space-y-2">
-                      {skill.achievements.map((achievement, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-blue-400 mt-1">•</span>
-                          <span>{achievement}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
+                
+                {/* 마크다운 콘텐츠 렌더링 */}
+                {skill.markdownContent && (
+                  <div className="markdown-content mt-4 text-lg leading-relaxed">
+                    {/* @ts-ignore - 타입 오류 무시 */}
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]} 
+                      rehypePlugins={[rehypeRaw]}
+                      components={{
+                        p: ({children}) => <p className="text-lg leading-relaxed my-3">{children}</p>,
+                        h1: ({children}) => <h1 className="text-2xl font-bold mt-6 mb-4 text-blue-300">{children}</h1>,
+                        h2: ({children}) => <h2 className="text-xl font-semibold mt-5 mb-3 text-blue-300">{children}</h2>,
+                        h3: ({children}) => <h3 className="text-lg font-medium mt-4 mb-2 text-blue-200">{children}</h3>,
+                        ul: ({children}) => <ul className="space-y-2 my-3">{children}</ul>,
+                        li: ({children}) => (
+                          <li className="ml-4 flex items-start gap-2">
+                            <span className="text-blue-300 mt-1">•</span>
+                            <span className="text-lg leading-relaxed">{children}</span>
+                          </li>
+                        ),
+                        strong: ({children}) => <strong className="font-semibold text-blue-200">{children}</strong>,
+                      }}
+                    >
+                      {skill.markdownContent}
+                    </ReactMarkdown>
+                  </div>
                 )}
               </div>
             </div>
